@@ -1,1 +1,130 @@
+from urllib.request import urlopen
+from urllib.error import HTTPError
+from urllib.error import URLError
+import json
+import csv
+import datetime
+import random
+
+
+random.seed(datetime.datetime.now())
+
+
+def request_from_place_autocomplete():
+
+    # data will be collected from place_autocomplete API
+    service = "https://maps.googleapis.com/maps/api/place/autocomplete/json?"
+
+    # Place types used from Place Autocomplete is regions with these outputs:
+    # locality, sublocality,postal_code, country, administrative_area_level_1, administrative_area_level_2
+
+    # language used for the output is English: language = en
+
+    # the final format of the url
+    request_url0 = "%sinput=%s&components=country:%s&types=(regions)&radius=%s&language=en&key=%s" % (service, name, country0, filter_limits, api_key)
+    print(request_url0)
+    try:
+        # Request data from the final url of place_autocomplete
+        html0 = urlopen(request_url0)
+    except HTTPError as e:
+        print(e)
+        print("Retrying to connect...")
+    except URLError as e:
+        print("The server is not available. Please try again later")
+        exit()
+    else:
+        # convert response to python dictionary
+        hf = json.load(html0)
+
+        # create a dump of the json file
+        with open('data0.json', 'w') as jk:
+            json.dump(hf, jk)
+
+        # create a test file to load all place ids
+        with open('data0.json', 'r') as fg:
+            for r in fg["predictions"]:
+                print(r["place_id"])
+                with open("place_ids.txt", "a", encoding='utf-8') as w:
+                    lines = r["place_id"].rstrip()
+                    w.writelines("%s\n" % lines)
+
+        # Create CSV file to receive data
+        with open('Business_details.csv', 'w') as file0:
+            # write the search terms
+            line1 = "%s,%s,%s,%s,%s,%s,%s,%s" % (name, city, state, country0, filter_limits, filter_rating, filter_price_level, filter_zip_code)
+            file0.writelines("Results with search terms : %s\n" % line1)
+
+            # write the headers' row
+            line2 = "Adress,Compete_adress,Rating,Price,Week Days_opening_and_closing_hours,Saturday_opening_and_closing_hours, Sunday_opening_and_closing_hours\n"
+            file0.writelines(line2)
+
+
+def request_from_place_details():
+
+    # data will be collected from google maps/place_details API
+    service = "https://maps.googleapis.com/maps/api/place/details/json?"
+
+    # output fields defined in the url
+    output_fields = "name,vicinity,formatted_address,photo,rating,price_level,opening_hours/weekday_text"
+
+    # language used for the output is English: language = en
+
+    # calling place_ids from list1 of request_from_place_autocomplete() and requesting data
+    with open("place_ids.txt", "r", encoding='utf-8') as h:
+        for line in h:
+            place_id = line
+            request_url1 = "%splaceid=%s&fields=%s&language=en&key=%s" % (service, place_id, output_fields, api_key)
+            try:
+                html1 = urlopen(request_url1)
+            except HTTPError as e:
+                print(e)
+            except URLError as e:
+                print("The server is not available. Please try again later")
+                exit()
+            else:
+                # convert response to python dictionary
+                js = json.load(html1)
+
+                # create a dump of the json file
+                with open('data.json', 'w') as fl:
+                    json.dump(js, fl)
+
+                # extract details from data1
+                with open('data.json', 'r') as fg:
+                    for d in fg["results"]:
+                        # write to our spreadsheet created above in function request_from_place_autocomplete()
+                        with open("Business_details.csv", "a") as gr:
+                            business_details1 = (d['formatted_address'] + "," + d['vicinity'] + "," + d['rating'] + "," + d['price_level'] + "," + d["weekday_text"] + "," + d["weekday_text"][5]+ "," + d["weekday_text"][6]).rstrip()
+                            gr.writelines("%s\n" % business_details1)
+
+
+def open_read_csv_file():
+    with open("Business_details.csv", 'r') as re:
+        csv_f = csv.reader(re)
+        for row in csv_f:
+            print('{:<20}  {:<20}  {:<20} {:<20}'.format(*row))
+
+
+# basic search items entered by the user
+print("Enter search term(s) like place name :\n")
+name = "%20".join(input().split())
+city = input("Enter the city name(s) :\n")
+state = input("Enter the State/ province name :\n")
+country0 = input("Enter the Country like \"US\" for \"USA\" :\n")
+
+# Specific filters entered by the user
+print("Enter now filter parameters")
+filter_limits = int(input("Enter the Limits like \"500\":\n"))
+filter_rating = int(input("Enter the Rating :\n"))
+filter_price_level = int(input("Enter the Price Level:\n"))
+filter_zip_code = int(input("Enter the Zip/ postal Code :\n"))
+api_key = input("Enter your API key :\n")
+
+
+if __name__ == '__main__':
+    request_from_place_autocomplete()
+    request_from_place_details()
+    open_read_csv_file()
+    exit()
+
 

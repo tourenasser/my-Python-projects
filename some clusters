@@ -1,0 +1,75 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+
+
+def form_clusters(x,k):
+    """Build clusters"""
+    # k = required number of clusters
+    no_clusters = k
+    model = KMeans(n_clusters=no_clusters, init='random')
+    model.fit(x)
+    labels = model.labels_
+    print(labels)
+    # Cacluate the silhouette score
+    sh_score = silhouette_score(x, labels)
+    return sh_score
+
+def form_clusters_points(points,k):
+    """Build clusters"""
+    # k = required number of clusters
+    no_clusters = k
+    model = KMeans(n_clusters=no_clusters, init='random')
+    model.fit(points)
+    labels = model.labels_
+    print(labels)
+    # Cacluate the silhouette score
+    sh_score = silhouette_score(points, labels)
+    return sh_score
+
+
+class Cluster(sh_score, k):
+    def __init__(self, x, y):
+        self.center = Point(x, y)
+        self.points = (x, y)
+
+    def update(self, points, k):
+        """Build clusters"""
+        # k = required number of clusters
+        no_clusters = k
+        model = KMeans(n_clusters=no_clusters, init='random')
+        model.fit(points)
+        labels = model.labels_
+        print(labels)
+        # Cacluate the silhouette score
+        sh_score = silhouette_score(points, labels)
+        return sh_score, k
+
+    def add_point(self, points):
+        points = (Point(*point) for point in points)
+        no_clusters = [i + 1 for i in range(1, 5)]
+
+
+def compute_result(points):
+    points = [Point(*point) for point in points]
+    a = Cluster(1, 0)
+    b = Cluster(-1, 0)
+    a_old = []
+    for _ in range(10000):  # max iterations
+        for point in points:
+            if point.distance(a.center) < point.distance(b.center):
+                # add the right point
+                sh_score = form_clusters(point, i + 1)
+                a_old.append(sh_score)
+                print("The silhouette coefficient is close to 1. This indicate good clustering")
+            else:
+                # add the right point
+                print("The silhouette coefficient is close to -1. This indicate bad clustering "
+                      "with risk of overlaping clusters")
+        if a_old == a.points:
+            break
+        a_old = ((b.points/(1 + Max(a.points, b.points)))
+        a.update()
+        b.update()
+        return [(x, y)] * 2

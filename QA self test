@@ -1,0 +1,108 @@
+import unittest
+from selenium import webdriver
+
+
+class HomePageTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        # create a new Firefox session
+        cls.driver = webdriver.Firefox()
+        cls.driver.implicitly_wait(30)
+        cls.driver.maximize_window()
+        cls.driver.get("http://www.auredo.com/")
+
+    @classmethod
+    def tearDownClass(cls):
+        # close the browser window
+        cls.driver.quit()
+
+    def test_nav_bar(self):
+        head_homepage = self.driver.find_element_by_tag_name("head")
+        self.assertIn("Plateforme de services connectés", head_homepage.find_element_by_tag_name("title").text)
+        # check the navigation barre is at the first row
+        navig_bar_position = self.driver.find_element_by_tag_name("body")
+        self.assertTrue(navig_bar_position.find_element_by_tag_name("header").find_element_by_css_selector("div.row row1") and
+                        navig_bar_position.find_element_by_tag_name("header").find_element_by_css_selector("div.divHmenu"))
+
+        # list of the navigation bar links
+        navig_bar = self.driver.find_element_by_tag_name("body").find_element_by_tag_name("ul.largenav")
+        emploi_link = navig_bar.find_element_by_partial_link_text("Emploi")
+        cvtheque_link = navig_bar.find_element_by_partial_link_text("CVthèque")
+        kiosque_link = navig_bar.find_element_by_partial_link_text("Kiosque")
+        entrepreneurs_link = navig_bar.find_element_by_partial_link_text("Entrepreneurs")
+        oppentreprises_link = navig_bar.find_element_by_partial_link_text("Opp. entreprises")
+        coachingdevie_link = navig_bar.find_element_by_partial_link_text("Coaching de Vie")
+        immobilier_link = navig_bar.find_element_by_partial_link_text("Immobilier")
+        paiementfacture_link = navig_bar.find_element_by_partial_link_text("Paiement-Facture")
+        creerunsite_link = navig_bar.find_element_by_partial_link_text("Créer un site")
+        webhosting_link = navig_bar.find_element_by_partial_link_text("Web Hosting")
+        seconnecter_link = navig_bar.find_element_by_partial_link_text("Se connecter")
+
+        # check that vav bar's links are displayed/visible in the Home page
+        self.assertTrue(emploi_link.is_displayed() and emploi_link.is_enabled())
+        emploi_link.click()
+        self.assertTrue( cvtheque_link.is_displayed()and cvtheque_link.is_enabled())
+        cvtheque_link.click()
+        self.assertTrue(kiosque_link.is_displayed()and kiosque_link.is_enabled())
+        kiosque_link.click()
+        self.assertTrue(entrepreneurs_link.is_displayed()and entrepreneurs_link.is_enabled())
+        entrepreneurs_link.click()
+        self.assertTrue(oppentreprises_link.is_displayed()and oppentreprises_link.is_enabled())
+        oppentreprises_link.click()
+        self.assertTrue(coachingdevie_link.is_displayed()and coachingdevie_link.is_enabled())
+        coachingdevie_link.click()
+        self.assertTrue(immobilier_link.is_displayed()and immobilier_link.is_enabled())
+        immobilier_link.click()
+        self.assertTrue(paiementfacture_link.is_displayed()and paiementfacture_link.is_enabled())
+        paiementfacture_link.click()
+        self.assertTrue(creerunsite_link.is_displayed()and creerunsite_link.is_enabled())
+        creerunsite_link.click()
+        self.assertTrue(webhosting_link.is_displayed()and webhosting_link.is_enabled())
+        webhosting_link.click()
+        self.assertTrue(seconnecter_link.is_displayed()and seconnecter_link.is_enabled())
+        seconnecter_link.click()
+
+    # Find the navigation barre at row2
+    def test_nav_bar2(self):
+        nav_bar2 = self.driver.find_element_by_css_selector("div.row row2")
+        self.assertTrue(nav_bar2.find_element_by_class_name("h2-menumobile"))
+        # Check the speed defined of the navigation bar with Javascript
+        # check if it is not a button and that the banner stop moving once the mouse is on it
+        script_nav_bar2 = nav_bar2.find_element_by_tag_name("script").text
+        self.assertIn("{speed:15,pause:true,buttons:false}", script_nav_bar2)
+        # Check the text displayed in the banner
+        banner_text = nav_bar2.find_elements_by_tag_name("li").text
+        self.assertListEqual(banner_text, ("BIENVENUE SUR AUREDO,", "LA 1ERE PLATEFORME DE SERVICES CONNECTES.", "NOUS FAISONS DE L'AFRIQUE UN PÔLE DE SERVICES INTERNET MONDIAL."))
+        self.assertTrue(nav_bar2.is_displayed())
+
+    # Find the Logo at the top left of the header
+    def test_logo_in_header(self):
+        logo_in_header = self.driver.find_element_by_css_selector("div.sidenav span.sidenav-heading")
+        self.assertTrue(logo_in_header.is_displayed() and logo_in_header.is_enabled())
+        logo_in_header.click()
+
+    # Check if the section title is displayed
+    def test_section(self):
+        self.assertEqual(self.driver.find_element_by_tag_name("h5").text, "Vos services connectés.")
+        self.assertTrue(self.driver.find_element_by_tag_name("h5").text.is_displayed())
+
+    # Find elements in the section
+    def test_section_elements(self):
+        master_section = self.driver.find_element_by_tag_name("body").find_element_by_tag_name("section")
+        paiement_de_factures_frontside = master_section.find_element_by_css_selector("div.frontside")
+        self.assertEqual(paiement_de_factures_frontside.find_element_by_css_selector("h4.card-title").text, "Paiement de factures" )
+        self.assertEqual(paiement_de_factures_frontside.find_element_by_css_selector("p.card-text").text,
+                         "Payez vos factures d'électricité et d'eau en ligne.")
+        paiement_de_factures_backside = master_section.find_element_by_css_selector("div.backside")
+        self.assertEqual(paiement_de_factures_frontside.find_element_by_css_selector("h4.card-title").text, "Paiement de factures" )
+        self.assertEqual(paiement_de_factures_frontside.find_element_by_css_selector("p.card-text").text,
+                         "Sur PaiementFacture vous payer vos factures d'électricité et d'eau en ligne quelque\
+                          soit le type de compteur et la ville où vous habitez au Bénin.")
+        paiement_de_factures_backside_button = paiement_de_factures_backside.find_element_by_css_selector("button.btn btn-primary")
+        self.assertEqual(paiement_de_factures_backside_button.text, " ACCEDER ")
+        self.assertTrue(paiement_de_factures_backside_button.is_displayed() and paiement_de_factures_backside_button.is_enabled())
+        paiement_de_factures_backside_button.click()
+
+
+if __name__ == '__main__':
+    unittest.main(verbosity=2)

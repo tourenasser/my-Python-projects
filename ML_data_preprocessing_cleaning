@@ -1,0 +1,89 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.linear_model import LinearRegression
+from sklearn import preprocessing
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error
+
+
+df_histcall = pd.read_csv('C:\DECA\IBB_H.txt', sep=',', dtype={'B_SUBNO': str, 'TRANSDATE': str})
+
+print(df_histcall.dtypes)
+print(df_histcall.head())
+
+
+# Add a column filled with 0
+df_histcall['BILLAMOUNT_PREDICTED'] = 0
+
+# delete columns where all observations are null or are not nunber
+df_histcall.dropna(axis=1, how='all', inplace=True)
+print(df_histcall.columns)
+print(df_histcall.head())
+
+# feature selection
+features = ['CONTRNO','SUBNO','B_SUBNO','DURATION','BILLAMOUNT','TARIFF_GROUP','CALL_TYPE','LAC',
+            'CELL_ID','DEST_CODE','IMEI_NUMBER','IMSI_NUMBER','RATE_PLAN','INT_FLAG']
+
+
+df = df_histcall[features]
+df = df[df.BILLAMOUNT > 0]
+print(df[df.corr() == 1])
+print(df.cov())
+
+
+# Convert binary fields to numeric boolean fields
+lb = preprocessing.LabelBinarizer()
+df.INT_FLAG = lb.fit_transform(df.INT_FLAG)
+df.RATE_PLAN = lb.fit_transform(df.RATE_PLAN)
+
+# Create dummy variables for categorial features:
+# 'CONTRNO','TARIFF_GROUP'
+df_CONTRNO = pd.get_dummies(df['CONTRNO'], prefix='CONTRNO', drop_first=True)
+df_TARIFF_GROUP = pd.get_dummies(df['TARIFF_GROUP'], prefix='TARIFF_GROUP', drop_first=True)
+
+
+# Join the dummy frames to the main dataframe
+df = pd.concat([df, df_CONTRNO], axis=1)
+df = pd.concat([df, df_TARIFF_GROUP], axis=1)
+
+
+# now we delete the initial columns whom have used too create dummies
+del df['CONTRNO']
+del df['TARIFF_GROUP']
+
+print(df)
+print(df.columns)
+print(df.head())
+
+# list of independent and dependent features
+independent_variables = ['SUBNO', 'B_SUBNO', 'DURATION','CALL_TYPE',
+       'LAC', 'CELL_ID', 'DEST_CODE', 'IMEI_NUMBER', 'IMSI_NUMBER',
+       'RATE_PLAN', 'INT_FLAG', 'CONTRNO_POSTPAID', 'CONTRNO_PREPAID',
+       'TARIFF_GROUP_TGOSMSG', 'TARIFF_GROUP_TGOSMSM', 'TARIFF_GROUP_TGOSMSO']
+
+X = df[independent_variables]
+y = df['BILLAMOUNT']
+
+# creation of an object of the model
+lr = LinearRegression()
+
+# split between train and test data set
+X_train,y_train, X_test, y_test = train_test_split(X,y, train_size=.80, random_state=1)
+
+# training of our model on the training data set
+lr.fit(X_train, y_train)
+
+# predition of the Billamount with the test dataset
+predictions_train = lr.predict(X_train)
+predictions_test = lr.predict(X_test)
+
+# Evaluation of the accuracy of the model used
+print('The R-square Error with the training data is :', r2_score(y_train, predictions_train))
+print("Mean Absolute Error with the training data:", mean_absolute_error(y_train, predictions_train))
+print("Root Mean squared error with the training data", np.sqrt(mean_squared_error(y_train, predictions_train)))
+
+print('The R-square Error with the test data is  :', r2_score(y_test, predictions_test))
+print("Mean Absolute Error with the test data is:", mean_absolute_error(y_test, predictions_test))
+print("Root Mean squared error with the test data is", np.sqrt(mean_squared_error(y_test, predictions_test)))
+

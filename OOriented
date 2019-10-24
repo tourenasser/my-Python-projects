@@ -1,0 +1,32 @@
+from functools import reduce
+import numpy as np
+from math import sqrt
+
+
+class Point(object):
+    points = ()
+
+    def __init__(self, x=0, y=0):
+        self.x = x
+        self.y = y
+
+    def __repr__(self):
+        return "Point(%r, %r)" % (self.x, self.y)
+
+    def add_sub_results(self, points):
+        points = (Point(*point) for point in points)
+        return [str(reduce(lambda x, y: x + y, points)), str(reduce(lambda x, y: x - y, points))]
+
+    def mult_result(self, points):
+        return [point * points * 2 for point in points]
+
+    def distance(self, other):
+        return np.sqrt(np.sum(np.power((x - y), 2)))
+
+    def dist_result(self, points):
+        points = [Point(*point) for point in points]
+        return [points[0].distance(point) for point in points]
+
+
+kf = Point()
+print(kf)

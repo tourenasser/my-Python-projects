@@ -1,0 +1,75 @@
+import pandas as pd
+import numpy as np
+import random
+import matplotlib
+from string import ascii_letters, digits
+import datetime
+
+myList= [1,2,3, 8, 24, 12]
+print(np.array(myList))
+
+dico = {'first_name': ['Jason', 'Molly', 'Tina', 'Jake', 'Amy'],'last_name': ['Miller', 'Jacobson', 'Ali', 'Milner', 'Cooze'],
+        'age': [42, 52, 36, 24, 73],'preTestScore': [4, 24, 31, 2, 3],'postTestScore': [25, 94, 57, 62, 70]}
+
+mydata = pd.DataFrame(dico, columns = ['first_name', 'last_name','age', 'preTestScore', 'postTestScore'])
+print(mydata)
+
+hg = [['Jason', 'Molly', 'Tina', 'Jake', 'Amy'],['Miller', 'Jacobson', 'Ali', 'Milner', 'Cooze'], [42, 52, 36, 24, 73],
+      [4, 24, 31, 2, 3], [25, 94, 57, 62, 70]]
+
+kl = ['first_name', 'last_name', 'age', 'preTestScore', 'postTestScore']
+
+gh = list(zip(kl, hg))
+print(gh)
+dicto = dict(gh)
+print(dicto)
+pot = pd.DataFrame(dicto)
+print(pot)
+
+print(pot['last_name'].head())
+print(type(pot['last_name']))
+print(pot.sum())
+print(pot.groupby('first_name', 0))
+
+
+usernames = ['alice36', 'bob_smith', 'eve']
+
+passwords = [''.join(np.random.choice(list(ascii_letters + digits), 8)) for x in range(3)]
+creation_dates = [datetime.datetime.now().date() - datetime.timedelta(int(x)) for x in np.random.randint(0, 1500, 3)]
+df = pd.DataFrame({'username': usernames, 'password': passwords, 'date-created': pd.to_datetime(creation_dates)})
+print(df)
+print(df.dtypes)
+print(pot.dtypes)
+random_data = np.random.random((3, 3))
+print(random_data)
+df_random = pd.DataFrame(random_data, columns=['a', 'b', 'c'])
+print(df_random)
+emails = ['alice.chan@gmail.com', 'bwsmith1983@gmail.com', 'fakemail123@yahoo.com']
+df['email'] = emails
+print(df)
+df.loc[3] = ['2015-01-29', '38uzFJ1n', 'melvintherobot', 'moviesrgood@moviesrgood.com']
+print(df)
+
+villes = ["cotonou", "parakou", "lokossa", "porto"]
+df["villes"] = villes
+regions = ["litoral", "atlantique", "borgou", "zou"]
+df["regions"] = regions
+df.loc[4] = ['2015-01-29', '38uzFJ1n', 'melvintherobot', 'moviesrgood@moviesrgood.com', "porga", "atacora"]
+df.drop(index=4)
+ks = df.drop(columns='regions')
+print(df)
+print(ks)
+
+myData = pd.read_csv("C:\Exercises\IAA_HISTCALL 14.txt", header=0, sep=',', encoding='utf-8')
+print(myData.head())
+x = myData['SUBNO'].describe()
+hj = int(myData['SUBNO'].mean())
+print(x)
+print(hj)
+xh = myData.describe()
+print(xh)
+
+monPdp = pd.value_counts(myData['SUBNO'])
+print(monPdp)
+
+

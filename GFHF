@@ -1,0 +1,98 @@
+def list_true(n):
+    true_list = []
+    n += n + 2
+    for n in range(1, an):
+        if n in [1, 2]:
+            true_list.append(False)
+        else:
+            true_list.append(True)
+    return true_list
+
+
+print(list_true(20))
+print(len(list_true(20)))
+
+assert len(list_true(20)) == 21
+assert list_true(20)[0] is False
+assert list_true(20)[1] is False
+
+
+def is_prime_fast(number):
+    if (number % 2) == 0 and (number > 2):
+        return False
+
+    for factor in range(2, number):
+        if number % factor == 0:
+            return False
+    return True
+
+
+def get_primes_fast(n):
+    prime_list = []
+    for number in range(1, n):
+        if is_prime_fast(number):
+            prime_list.append(number)
+    return prime_list
+
+
+def mark_false(bool_list, p):
+    bool_list1 = list_true(bool_list)
+    for i in range(len(bool_list1)):
+        for j in range(2, bool_list):
+            if i == p * j:
+                bool_list1[i] = False
+    return bool_list1
+
+
+sd = mark_false(6, 2)
+print(sd)
+
+
+def find_next_1(bool_list_1, p):
+    for i, v in enumerate(bool_list_1):
+        if i > p and v == True:
+            return i
+
+
+assert find_next_1([True, True, True, True], 2) == 3
+assert find_next_1([True, True, True, False], 2) is None
+
+mq = [False, False, True, True, False]
+
+
+def prime_from_list(bool_list):
+    kh_list = []
+    for bool in bool_list:
+        if str(bool) == "True":
+            kh_list.append(bool_list.index(bool))
+    return kh_list
+
+
+def prime_from_list_1(bool_list):
+    kh_list = []
+    for i, j in enumerate(bool_list):
+        if (i, j) == (i, True):
+            kh_list.append(i)
+
+    return kh_list
+
+
+li = prime_from_list([False, False, True, True, False])
+print(li)
+
+pi = prime_from_list_1([False, False, True, True, False])
+print(pi)
+
+assert prime_from_list_1([False, False, True, True, False]) == [2, 3]
+
+
+def sieve(n):
+    bool_list = list_true(n)
+    p = 2
+    while p is not None:
+        bool_list = mark_false(bool_list, p)
+        p = find_next_1(bool_list, p)
+    return prime_from_list_1(bool_list)
+
+
+assert sieve(1000) == get_primes_fast(1000)
